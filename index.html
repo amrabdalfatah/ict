@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICT</title>
+  <style>
+    :root {
+      --primary-color: #4A90E2;
+      --secondary-color: #50E3C2;
+      --accent-color: #F5A623;
+      --bg-color: #F0F4F8;
+      --card-bg: #FFFFFF;
+      --text-color: #333333;
+      --correct-color: #2ECC71;
+      --incorrect-color: #E74C3C;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin: 0;
+    }
+
+    .dashboard {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 700px;
+      background-color: var(--card-bg);
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .stat-box span {
+      color: var(--accent-color);
+    }
+
+    .game-container {
+      background-color: var(--card-bg);
+      width: 100%;
+      max-width: 700px;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .category-badge {
+      display: inline-block;
+      background-color: var(--secondary-color);
+      color: #000;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background-color: #f7f9fa;
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .btn.correct {
+      background-color: var(--correct-color);
+      color: white;
+      border-color: var(--correct-color);
+    }
+
+    .btn.incorrect {
+      background-color: var(--incorrect-color);
+      color: white;
+      border-color: var(--incorrect-color);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .next-btn {
+      background-color: var(--accent-color);
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .next-btn:hover {
+      opacity: 0.9;
+    }
+
+    .win-screen {
+      text-align: center;
+      display: none;
+    }
+
+    .win-screen h2 {
+      color: var(--correct-color);
+      font-size: 2rem;
+    }
+
+    .restart-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🚀 Lesson Three</h1>
+    <p>Earn Tech Coins by answering questions correctly!</p>
+  </header>
+
+  <div class="dashboard">
+    <div class="stat-box">Coins: <span id="coins">0</span> 🪙</div>
+    <div class="stat-box">Question: <span id="progress">1</span>/10</div>
+  </div>
+
+  <div class="game-container">
+    <div id="quiz-screen">
+      <div class="category-badge" id="category">Category</div>
+      <div class="question-text" id="question">Question text goes here...</div>
+      <div class="options-grid" id="options">
+        <!-- Options injected dynamically -->
+      </div>
+      <div class="controls">
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question ➔</button>
+      </div>
+    </div>
+
+    <div class="win-screen" id="win-screen">
+      <h2>🎉 Mission Accomplished!</h2>
+      <p>You have earned the <strong>Master Tech Designer</strong> badge!</p>
+      <p id="final-score"></p>
+      <button class="restart-btn" onclick="restartGame()">Play Again 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        category: "Goals of Technology",
+        question: "What are two main goals of technology for people of determination?",
+        options: [
+          "To improve independence and improve their lives",
+          "To make devices more expensive and harder to use",
+          "To replace human teachers and doctors",
+          "To increase screen time for children"
+        ],
+        answer: 0
+      },
+      {
+        category: "Goals of Technology",
+        question: "When designing technology, we should imagine how ___ will use it.",
+        options: ["Only scientists", "Everyone", "Only adults", "Only engineers"],
+        answer: 1
+      },
+      {
+        category: "Assistive Features",
+        question: "How can smartphones assist users with poor vision or hand movement challenges?",
+        options: [
+          "By locking the screen automatically",
+          "By turning off voice features",
+          "By enlarging text or using voice commands",
+          "By hiding setting menus"
+        ],
+        answer: 2
+      },
+      {
+        category: "Assistive Features",
+        question: "Which device allows blind individuals to read and write easily using laptops?",
+        options: ["A regular mouse", "A Braille terminal", "A high-resolution monitor", "A wireless printer"],
+        answer: 1
+      },
+      {
+        category: "User Experience (UX)",
+        question: "What does User Experience (UX) describe?",
+        options: [
+          "How much a device costs to buy",
+          "How people use and interact with technological devices",
+          "The speed of an internet connection",
+          "The weight of a computer battery"
+        ],
+        answer: 1
+      },
+      {
+        category: "User Experience (UX)",
+        question: "In what two ways can user experience be categorized?",
+        options: [
+          "Fast or Slow",
+          "Positive or Negative",
+          "Expensive or Cheap",
+          "Old or New"
+        ],
+        answer: 1
+      },
+      {
+        category: "Robot Evaluation",
+        question: "Which of the following is considered a limitation of a smart home vacuum robot?",
+        options: [
+          "It helps clean floors automatically",
+          "It saves time and effort",
+          "It may fail with small objects or fail to clean corners and stairs",
+          "It can be controlled remotely"
+        ],
+        answer: 2
+      },
+      {
+        category: "Robot Evaluation",
+        question: "If a robot can be used by the elderly or people with movement difficulty, which UX factor does this reflect?",
+        options: ["Desirable", "Accessible", "Limitations", "Can be developed"],
+        answer: 1
+      },
+      {
+        category: "Robot Evaluation",
+        question: "How can a smart home robot be developed further in the future?",
+        options: [
+          "By making it larger and heavier",
+          "By removing its sensors",
+          "By making it smaller, reaching difficult places, or adding a remote camera",
+          "By making it operate only once a week"
+        ],
+        answer: 2
+      },
+      {
+        category: "Vocabulary",
+        question: "What term refers to technology designed specifically to assist individuals and people with special needs?",
+        options: [
+          "Cutting-edge technology",
+          "Assistive technology",
+          "Virtual reality",
+          "Network infrastructure"
+        ],
+        answer: 1
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let coins = 0;
+
+    const categoryEl = document.getElementById("category");
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const coinsEl = document.getElementById("coins");
+    const progressEl = document.getElementById("progress");
+    const quizScreen = document.getElementById("quiz-screen");
+    const winScreen = document.getElementById("win-screen");
+    const finalScoreEl = document.getElementById("final-score");
+
+    function loadQuestion() {
+      nextBtn.style.display = "none";
+      const q = questions[currentQuestionIndex];
+      categoryEl.textContent = q.category;
+      questionEl.textContent = q.question;
+      progressEl.textContent = currentQuestionIndex + 1;
+
+      optionsEl.innerHTML = "";
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.textContent = opt;
+        btn.onclick = () => selectAnswer(idx, q.answer);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(selectedIdx, correctIdx) {
+      const buttons = optionsEl.querySelectorAll(".btn");
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === correctIdx) {
+          btn.classList.add("correct");
+        }
+        if (idx === selectedIdx && selectedIdx !== correctIdx) {
+          btn.classList.add("incorrect");
+        }
+      });
+
+      if (selectedIdx === correctIdx) {
+        coins += 10;
+        coinsEl.textContent = coins;
+      }
+
+      nextBtn.style.display = "block";
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        loadQuestion();
+      } else {
+        showWinScreen();
+      }
+    }
+
+    function showWinScreen() {
+      quizScreen.style.display = "none";
+      winScreen.style.display = "block";
+      finalScoreEl.textContent = `You total score: ${coins} Tech Coins out of 100!`;
+    }
+
+    function restartGame() {
+      currentQuestionIndex = 0;
+      coins = 0;
+      coinsEl.textContent = coins;
+      winScreen.style.display = "none";
+      quizScreen.style.display = "block";
+      loadQuestion();
+    }
+
+    // Initialize game
+    loadQuestion();
+  </script>
+</body>
+</html>
