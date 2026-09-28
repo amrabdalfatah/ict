@@ -1,382 +1,735 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICT</title>
-  <style>
-    :root {
-      --primary-color: #4A90E2;
-      --secondary-color: #50E3C2;
-      --accent-color: #F5A623;
-      --bg-color: #F0F4F8;
-      --card-bg: #FFFFFF;
-      --text-color: #333333;
-      --correct-color: #2ECC71;
-      --incorrect-color: #E74C3C;
-    }
+  <head>
+    <!-- figma:head-start -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 4 – Digital Search Tools Quiz</title>
+    <!-- figma:head-end -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    * {
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      color: var(--primary-color);
-      margin: 0;
-    }
-
-    .dashboard {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 700px;
-      background-color: var(--card-bg);
-      padding: 15px 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-
-    .stat-box {
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-
-    .stat-box span {
-      color: var(--accent-color);
-    }
-
-    .game-container {
-      background-color: var(--card-bg);
-      width: 100%;
-      max-width: 700px;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    .category-badge {
-      display: inline-block;
-      background-color: var(--secondary-color);
-      color: #000;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      font-size: 0.9rem;
-    }
-
-    .question-text {
-      font-size: 1.25rem;
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
-
-    .options-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .btn {
-      background-color: #f7f9fa;
-      border: 2px solid var(--primary-color);
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 1rem;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.2s ease;
-    }
-
-    .btn:hover:not(:disabled) {
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .btn:disabled {
-      cursor: not-allowed;
-    }
-
-    .btn.correct {
-      background-color: var(--correct-color);
-      color: white;
-      border-color: var(--correct-color);
-    }
-
-    .btn.incorrect {
-      background-color: var(--incorrect-color);
-      color: white;
-      border-color: var(--incorrect-color);
-    }
-
-    .controls {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .next-btn {
-      background-color: var(--accent-color);
-      border: none;
-      color: white;
-      padding: 12px 24px;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      display: none;
-    }
-
-    .next-btn:hover {
-      opacity: 0.9;
-    }
-
-    .win-screen {
-      text-align: center;
-      display: none;
-    }
-
-    .win-screen h2 {
-      color: var(--correct-color);
-      font-size: 2rem;
-    }
-
-    .restart-btn {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <h1>🚀 Lesson Three</h1>
-    <p>Earn Tech Coins by answering questions correctly!</p>
-  </header>
-
-  <div class="dashboard">
-    <div class="stat-box">Coins: <span id="coins">0</span> 🪙</div>
-    <div class="stat-box">Question: <span id="progress">1</span>/10</div>
-  </div>
-
-  <div class="game-container">
-    <div id="quiz-screen">
-      <div class="category-badge" id="category">Category</div>
-      <div class="question-text" id="question">Question text goes here...</div>
-      <div class="options-grid" id="options">
-        <!-- Options injected dynamically -->
-      </div>
-      <div class="controls">
-        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question ➔</button>
-      </div>
-    </div>
-
-    <div class="win-screen" id="win-screen">
-      <h2>🎉 Mission Accomplished!</h2>
-      <p>You have earned the <strong>Master Tech Designer</strong> badge!</p>
-      <p id="final-score"></p>
-      <button class="restart-btn" onclick="restartGame()">Play Again 🔄</button>
-    </div>
-  </div>
-
-  <script>
-    const questions = [
-      {
-        category: "Goals of Technology",
-        question: "What are two main goals of technology for people of determination?",
-        options: [
-          "To improve independence and improve their lives",
-          "To make devices more expensive and harder to use",
-          "To replace human teachers and doctors",
-          "To increase screen time for children"
-        ],
-        answer: 0
-      },
-      {
-        category: "Goals of Technology",
-        question: "When designing technology, we should imagine how ___ will use it.",
-        options: ["Only scientists", "Everyone", "Only adults", "Only engineers"],
-        answer: 1
-      },
-      {
-        category: "Assistive Features",
-        question: "How can smartphones assist users with poor vision or hand movement challenges?",
-        options: [
-          "By locking the screen automatically",
-          "By turning off voice features",
-          "By enlarging text or using voice commands",
-          "By hiding setting menus"
-        ],
-        answer: 2
-      },
-      {
-        category: "Assistive Features",
-        question: "Which device allows blind individuals to read and write easily using laptops?",
-        options: ["A regular mouse", "A Braille terminal", "A high-resolution monitor", "A wireless printer"],
-        answer: 1
-      },
-      {
-        category: "User Experience (UX)",
-        question: "What does User Experience (UX) describe?",
-        options: [
-          "How much a device costs to buy",
-          "How people use and interact with technological devices",
-          "The speed of an internet connection",
-          "The weight of a computer battery"
-        ],
-        answer: 1
-      },
-      {
-        category: "User Experience (UX)",
-        question: "In what two ways can user experience be categorized?",
-        options: [
-          "Fast or Slow",
-          "Positive or Negative",
-          "Expensive or Cheap",
-          "Old or New"
-        ],
-        answer: 1
-      },
-      {
-        category: "Robot Evaluation",
-        question: "Which of the following is considered a limitation of a smart home vacuum robot?",
-        options: [
-          "It helps clean floors automatically",
-          "It saves time and effort",
-          "It may fail with small objects or fail to clean corners and stairs",
-          "It can be controlled remotely"
-        ],
-        answer: 2
-      },
-      {
-        category: "Robot Evaluation",
-        question: "If a robot can be used by the elderly or people with movement difficulty, which UX factor does this reflect?",
-        options: ["Desirable", "Accessible", "Limitations", "Can be developed"],
-        answer: 1
-      },
-      {
-        category: "Robot Evaluation",
-        question: "How can a smart home robot be developed further in the future?",
-        options: [
-          "By making it larger and heavier",
-          "By removing its sensors",
-          "By making it smaller, reaching difficult places, or adding a remote camera",
-          "By making it operate only once a week"
-        ],
-        answer: 2
-      },
-      {
-        category: "Vocabulary",
-        question: "What term refers to technology designed specifically to assist individuals and people with special needs?",
-        options: [
-          "Cutting-edge technology",
-          "Assistive technology",
-          "Virtual reality",
-          "Network infrastructure"
-        ],
-        answer: 1
+      body {
+        font-family: 'Nunito', sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #4338ca 0%, #7c3aed 55%, #9333ea 100%);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 2rem 1rem 3rem;
       }
-    ];
 
-    let currentQuestionIndex = 0;
-    let coins = 0;
+      /* ── Layout ── */
+      .container { width: 100%; max-width: 600px; }
 
-    const categoryEl = document.getElementById("category");
-    const questionEl = document.getElementById("question");
-    const optionsEl = document.getElementById("options");
-    const nextBtn = document.getElementById("next-btn");
-    const coinsEl = document.getElementById("coins");
-    const progressEl = document.getElementById("progress");
-    const quizScreen = document.getElementById("quiz-screen");
-    const winScreen = document.getElementById("win-screen");
-    const finalScoreEl = document.getElementById("final-score");
+      /* ── Part notice (section transition) ── */
+      .part-notice {
+        border-radius: 20px;
+        border: 2px solid;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        animation: slideDown 0.3s ease;
+      }
+      .part-notice.p1 { background: #eef2ff; border-color: #c7d2fe; }
+      .part-notice.p2 { background: #fdf2f8; border-color: #fbcfe8; }
+      .part-notice-icon { font-size: 22px; flex-shrink: 0; }
+      .part-notice-title { font-size: 13px; font-weight: 900; line-height: 1.2; }
+      .part-notice.p1 .part-notice-title { color: #4338ca; }
+      .part-notice.p2 .part-notice-title { color: #be185d; }
+      .part-notice-sub { font-size: 11px; font-weight: 600; color: #6b7280; margin-top: 2px; }
 
-    function loadQuestion() {
-      nextBtn.style.display = "none";
-      const q = questions[currentQuestionIndex];
-      categoryEl.textContent = q.category;
-      questionEl.textContent = q.question;
-      progressEl.textContent = currentQuestionIndex + 1;
+      /* ── Card ── */
+      .card {
+        background: #fff;
+        border-radius: 28px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.1);
+        overflow: hidden;
+      }
 
-      optionsEl.innerHTML = "";
-      q.options.forEach((opt, idx) => {
-        const btn = document.createElement("button");
-        btn.className = "btn";
-        btn.textContent = opt;
-        btn.onclick = () => selectAnswer(idx, q.answer);
-        optionsEl.appendChild(btn);
-      });
-    }
+      /* ── Card header ── */
+      .card-header {
+        padding: 18px 26px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(110deg, #6366f1, #7c3aed);
+        transition: background 0.5s ease;
+      }
+      .card-header.p2 { background: linear-gradient(110deg, #ec4899, #f43f5e); }
 
-    function selectAnswer(selectedIdx, correctIdx) {
-      const buttons = optionsEl.querySelectorAll(".btn");
-      buttons.forEach((btn, idx) => {
-        btn.disabled = true;
-        if (idx === correctIdx) {
-          btn.classList.add("correct");
+      .header-left  { display: flex; align-items: center; gap: 10px; }
+      .header-icon  { font-size: 24px; }
+      .header-eyebrow {
+        color: rgba(255,255,255,0.6);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        line-height: 1;
+        margin-bottom: 3px;
+      }
+      .header-name { color: #fff; font-size: 14px; font-weight: 900; line-height: 1.2; }
+      .header-right { text-align: right; }
+      .header-counter { color: #fff; font-size: 15px; font-weight: 900; }
+      .header-counter span { color: rgba(255,255,255,0.4); font-weight: 700; }
+      .header-part { color: rgba(255,255,255,0.55); font-size: 10px; font-weight: 700; margin-top: 2px; }
+
+      /* ── Progress bar ── */
+      .progress-track { height: 6px; background: #e0e7ff; transition: background 0.5s; }
+      .progress-track.p2 { background: #fce7f3; }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #818cf8, #a78bfa);
+        width: 0%;
+        transition: width 0.5s ease, background 0.5s;
+      }
+      .progress-fill.p2 { background: linear-gradient(90deg, #f472b6, #fb7185); }
+
+      /* ── Card body ── */
+      .card-body { padding: 28px 30px 30px; }
+
+      .part-badge {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: #6366f1;
+        margin-bottom: 12px;
+        transition: color 0.4s;
+      }
+      .part-badge.p2 { color: #ec4899; }
+
+      .question-text {
+        font-size: 18px;
+        font-weight: 800;
+        color: #111827;
+        line-height: 1.45;
+        margin-bottom: 22px;
+      }
+
+      /* ── MCQ buttons ── */
+      .answers-mcq { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+
+      .mcq-btn {
+        width: 100%;
+        text-align: left;
+        padding: 13px 16px;
+        border-radius: 14px;
+        border: 2px solid #e5e7eb;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        font-family: 'Nunito', sans-serif;
+        transition: border-color 0.15s, background 0.15s, opacity 0.2s;
+      }
+      .mcq-btn:hover:not(:disabled) { border-color: #818cf8; background: #eef2ff; }
+      .mcq-btn:disabled { cursor: default; }
+      .mcq-btn.state-correct { border-color: #22c55e; background: #f0fdf4; }
+      .mcq-btn.state-wrong   { border-color: #f87171; background: #fff1f2; }
+      .mcq-btn.state-dimmed  { border-color: #f3f4f6; background: #f9fafb; opacity: .5; }
+
+      .mcq-badge {
+        width: 32px; height: 32px;
+        border-radius: 10px;
+        background: #e0e7ff;
+        color: #6366f1;
+        font-size: 12px;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: background 0.15s, color 0.15s;
+      }
+      .mcq-badge.bc { background: #22c55e; color: #fff; }
+      .mcq-badge.bw { background: #f87171; color: #fff; }
+      .mcq-badge.bd { background: #e5e7eb; color: #9ca3af; }
+
+      .mcq-label { font-size: 15px; font-weight: 700; color: #1f2937; line-height: 1.3; }
+      .mcq-label.lc { color: #15803d; }
+      .mcq-label.lw { color: #be123c; }
+      .mcq-label.ld { color: #9ca3af; }
+
+      /* ── T/F buttons ── */
+      .answers-tf { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+
+      .tf-btn {
+        padding: 22px 12px;
+        border-radius: 18px;
+        border: 2px solid;
+        font-family: 'Nunito', sans-serif;
+        font-size: 16px;
+        font-weight: 900;
+        cursor: pointer;
+        transition: all 0.15s;
+        line-height: 1.3;
+      }
+      .tf-btn.tf-true  { border-color: #86efac; background: #f0fdf4; color: #16a34a; }
+      .tf-btn.tf-false { border-color: #fca5a5; background: #fff1f2; color: #dc2626; }
+      .tf-btn.tf-true:hover:not(:disabled)  { border-color: #4ade80; background: #dcfce7; }
+      .tf-btn.tf-false:hover:not(:disabled) { border-color: #f87171; background: #ffe4e6; }
+      .tf-btn:disabled { cursor: default; }
+      .tf-btn.tf-correct { border-color: #22c55e !important; background: #dcfce7 !important; color: #15803d !important; }
+      .tf-btn.tf-wrong   { border-color: #f87171 !important; background: #ffe4e6 !important; color: #be123c !important; }
+      .tf-btn.tf-dimmed  { border-color: #f3f4f6 !important; background: #f9fafb !important; color: #d1d5db !important; opacity: .5; }
+
+      /* ── Feedback ── */
+      .feedback {
+        border-radius: 16px;
+        border: 2px solid;
+        padding: 15px 18px;
+        margin-bottom: 18px;
+        animation: fadeIn 0.25s ease;
+      }
+      .feedback.fb-correct { background: #f0fdf4; border-color: #bbf7d0; }
+      .feedback.fb-wrong   { background: #fff1f2; border-color: #fecdd3; }
+      .fb-title { font-size: 14px; font-weight: 900; margin-bottom: 5px; }
+      .feedback.fb-correct .fb-title { color: #15803d; }
+      .feedback.fb-wrong   .fb-title { color: #be123c; }
+      .fb-text { font-size: 13px; font-weight: 600; line-height: 1.55; }
+      .feedback.fb-correct .fb-text { color: #16a34a; }
+      .feedback.fb-wrong   .fb-text { color: #e11d48; }
+
+      /* ── Next button ── */
+      .next-btn {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(110deg, #6366f1, #7c3aed);
+        color: #fff;
+        font-family: 'Nunito', sans-serif;
+        font-size: 16px;
+        font-weight: 900;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(99,102,241,0.38);
+        transition: opacity 0.15s, transform 0.1s, background 0.5s, box-shadow 0.5s;
+      }
+      .next-btn.p2 {
+        background: linear-gradient(110deg, #ec4899, #f43f5e);
+        box-shadow: 0 8px 24px rgba(236,72,153,0.38);
+      }
+      .next-btn:hover  { opacity: .9; }
+      .next-btn:active { transform: scale(.98); }
+
+      /* ── Progress dots ── */
+      .dots { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
+      .dot {
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255,255,255,.3);
+        transition: width 0.3s ease, background 0.3s;
+      }
+      .dot.active { width: 22px; background: #fff; }
+      .dot.done   { width: 8px;  background: rgba(255,255,255,.75); }
+      .dot.future { width: 8px;  background: rgba(255,255,255,.25); }
+
+      /* ═══════════════════════════════════════
+         Results screen
+      ═══════════════════════════════════════ */
+      .results-card {
+        background: #fff;
+        border-radius: 28px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.28);
+        overflow: hidden;
+      }
+      .results-header {
+        background: linear-gradient(110deg, #6366f1, #7c3aed);
+        padding: 22px 28px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .rh-icon { font-size: 24px; }
+      .rh-eyebrow {
+        color: rgba(255,255,255,.6);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+      }
+      .rh-title { color: #fff; font-size: 15px; font-weight: 900; margin-top: 3px; }
+
+      .results-body { padding: 36px 32px 32px; text-align: center; }
+
+      .result-emoji { font-size: 72px; margin-bottom: 14px; animation: pop 0.4s cubic-bezier(.175,.885,.32,1.275); }
+
+      @keyframes pop {
+        0%   { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      .result-title { font-size: 30px; font-weight: 900; color: #111827; }
+      .result-msg {
+        font-size: 14px;
+        font-weight: 600;
+        color: #6b7280;
+        margin: 8px auto 26px;
+        max-width: 320px;
+        line-height: 1.55;
+      }
+
+      .score-box {
+        background: #eef2ff;
+        border-radius: 20px;
+        padding: 22px 20px 18px;
+        margin-bottom: 20px;
+      }
+      .score-num { font-size: 56px; font-weight: 900; color: #4338ca; line-height: 1; }
+      .score-denom { font-size: 26px; font-weight: 700; color: #a5b4fc; }
+      .score-lbl { font-size: 13px; font-weight: 700; color: #6366f1; margin-top: 6px; }
+
+      .part-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+      .pb-box { border-radius: 16px; padding: 16px; }
+      .pb-box.pb1 { background: #f5f3ff; }
+      .pb-box.pb2 { background: #fdf2f8; }
+      .pb-lbl { font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+      .pb-box.pb1 .pb-lbl { color: #7c3aed; }
+      .pb-box.pb2 .pb-lbl { color: #be185d; }
+      .pb-score { font-size: 26px; font-weight: 900; }
+      .pb-box.pb1 .pb-score { color: #6d28d9; }
+      .pb-box.pb2 .pb-score { color: #be185d; }
+      .pb-den { font-size: 15px; font-weight: 700; opacity: .35; }
+
+      .bubbles-lbl { font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: #9ca3af; margin-bottom: 12px; }
+      .bubbles { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 22px; }
+      .bubble {
+        width: 38px; height: 38px;
+        border-radius: 11px;
+        border: 2px solid;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 900;
+      }
+      .bubble.ok  { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+      .bubble.bad { background: #ffe4e6; color: #dc2626; border-color: #fca5a5; }
+
+      .results-footer { font-size: 12px; font-weight: 600; color: #9ca3af; line-height: 1.5; }
+
+      /* ── Animations ── */
+      @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 480px) {
+        body { padding: 1rem 0.75rem 2rem; }
+        .card-body { padding: 22px 20px 24px; }
+        .question-text { font-size: 16px; }
+        .mcq-label { font-size: 14px; }
+        .answers-tf { grid-template-columns: 1fr 1fr; }
+        .tf-btn { padding: 18px 8px; font-size: 14px; }
+        .results-body { padding: 28px 22px 26px; }
+        .score-num { font-size: 44px; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- figma:body-start -->
+    <div class="container" id="app"></div>
+    <!-- figma:body-end -->
+
+    <script>
+      /* ═══════════════════════════════════════════
+         DATA
+      ═══════════════════════════════════════════ */
+      const QUESTIONS = [
+        /* ── Part 1: Choose the correct answer ── */
+        {
+          part: 1,
+          q: "The most important commands used in word processing programs are ___",
+          opts: ["Copy", "Cut", "Paste", "All of them"],
+          ans: 3,
+          exp: "Copy, Cut, and Paste are all commonly used commands in word processing programs like Microsoft Word and Excel."
+        },
+        {
+          part: 1,
+          q: "EKB (Egyptian Knowledge Bank) is a type of ___",
+          opts: ["Database", "Search engine", "Library catalog", "None of them"],
+          ans: 0,
+          exp: "The EKB is a very large public database — a digital library containing all kinds of useful information for Egyptians."
+        },
+        {
+          part: 1,
+          q: "Internet search engines may provide ___ information.",
+          opts: ["Reliable only", "Unreliable only", "Both reliable and unreliable", "None of them"],
+          ans: 2,
+          exp: "Search engines like Google can give you both reliable and unreliable information, so always check your sources carefully!"
+        },
+        {
+          part: 1,
+          q: "To add copied content to another place, use the ___ command.",
+          opts: ["Cut", "Copy", "Paste", "Del"],
+          ans: 2,
+          exp: "Paste (Ctrl + V) places the copied or cut content in a new location. Always copy or cut first, then paste."
+        },
+        {
+          part: 1,
+          q: "A database is a very large, organized library containing lots of ___",
+          opts: ["Secrets", "Hardware", "Information", "Entertainment"],
+          ans: 2,
+          exp: "A database contains a lot of information, like a very organized library where each piece of information has a specific place."
+        },
+        {
+          part: 1,
+          q: "___ is a database that includes all the items owned by a library.",
+          opts: ["The EKB", "A search engine", "A library catalog", "A keyword"],
+          ans: 2,
+          exp: "A library catalog is a database that stores all the books, resources, and sources owned by a library — like the Alexandria Library Catalog."
+        },
+        {
+          part: 1,
+          q: "To copy a text or image, use the keyboard shortcut ___",
+          opts: ["Ctrl + C", "Ctrl + X", "Ctrl + V", "Ctrl + P"],
+          ans: 0,
+          exp: "Ctrl + C copies the selected item. Select the text or image first, then press Ctrl + C to copy it."
+        },
+        {
+          part: 1,
+          q: "When you search online, make sure the results you get are ___",
+          opts: ["Reliable", "Accurate", "Biased", "Both reliable and accurate"],
+          ans: 3,
+          exp: "When searching online, always make sure the information is both reliable (from a trusted source) and accurate (correct and factual)."
+        },
+        {
+          part: 1,
+          q: "To move content from one place to another, use the ___ command.",
+          opts: ["Copy", "Del", "Cut", "Paste"],
+          ans: 2,
+          exp: "Cut (Ctrl + X) removes the selected item from its original place so you can move it to a new location using Paste (Ctrl + V)."
+        },
+        {
+          part: 1,
+          q: "To paste a text or image, use the shortcut ___",
+          opts: ["Ctrl + X", "Ctrl + V", "Ctrl + P", "Ctrl + A"],
+          ans: 1,
+          exp: "Ctrl + V pastes the copied or cut item into the new location. Remember: C = Copy, X = Cut, V = Paste!"
+        },
+        {
+          part: 1,
+          q: "You can use ___ to move a text or image to another place.",
+          opts: ["Ctrl + V", "Ctrl + C", "Ctrl + X", "Ctrl + Z"],
+          ans: 2,
+          exp: "Ctrl + X (Cut) moves the selected text or image from its current location. Use Ctrl + V to place it in the new spot."
+        },
+        {
+          part: 1,
+          q: "___ is a collection of information, usually stored in a computer system.",
+          opts: ["Paper books", "Search engines", "Databases", "Digital search tools"],
+          ans: 2,
+          exp: "Databases are organized collections of information stored in a computer system, where each piece of information has a specific, easy-to-find place."
+        },
+
+        /* ── Part 2: True or False ── */
+        {
+          part: 2,
+          q: "Copy, Cut, and Paste are word processing commands.",
+          opts: ["True ✓", "False ✗"],
+          ans: 0,
+          exp: "True! Copy, Cut, and Paste are some of the most commonly used commands in word processing programs like Word and Excel."
+        },
+        {
+          part: 2,
+          q: "A database is a large set of information that is highly organized.",
+          opts: ["True ✓", "False ✗"],
+          ans: 0,
+          exp: "True! A database is like a very organized library — a large, structured collection of information where everything has its place."
+        },
+        {
+          part: 2,
+          q: "The library catalog is a type of search engine.",
+          opts: ["True ✓", "False ✗"],
+          ans: 1,
+          exp: "False! A library catalog is a type of database — not a search engine. It stores all the books and resources owned by a library."
+        },
+        {
+          part: 2,
+          q: "Ctrl + C removes the text from the document.",
+          opts: ["True ✓", "False ✗"],
+          ans: 1,
+          exp: "False! Ctrl + C copies the text — it does NOT remove it. Ctrl + X (Cut) is what removes text from its original location."
+        },
+        {
+          part: 2,
+          q: "The Egyptian Knowledge Bank (EKB) is a database primarily for games and entertainment.",
+          opts: ["True ✓", "False ✗"],
+          ans: 1,
+          exp: "False! The EKB is a large public database containing all kinds of useful educational information — not games or entertainment."
+        },
+        {
+          part: 2,
+          q: "You can press Ctrl + C to cut a text or an image in Windows.",
+          opts: ["True ✓", "False ✗"],
+          ans: 1,
+          exp: "False! Ctrl + C copies content. To cut (move) content you must use Ctrl + X."
+        },
+        {
+          part: 2,
+          q: "After cutting or copying an item, you can place it in a new location using Ctrl + V.",
+          opts: ["True ✓", "False ✗"],
+          ans: 0,
+          exp: "True! After using Ctrl + C (Copy) or Ctrl + X (Cut), press Ctrl + V (Paste) to place the item in its new location."
+        },
+        {
+          part: 2,
+          q: "Google search engine helps in searching for the required information.",
+          opts: ["True ✓", "False ✗"],
+          ans: 0,
+          exp: "True! Google is an Internet search engine that helps you find information. Just remember — it may also return unreliable results, so always verify!"
         }
-        if (idx === selectedIdx && selectedIdx !== correctIdx) {
-          btn.classList.add("incorrect");
+      ];
+
+      const LABELS       = ['A', 'B', 'C', 'D'];
+      const PART1_COUNT  = QUESTIONS.filter(q => q.part === 1).length;
+      const TOTAL        = QUESTIONS.length;
+
+      /* ═══════════════════════════════════════════
+         STATE
+      ═══════════════════════════════════════════ */
+      let current  = 0;
+      let answered = false;
+      let selected = null;
+      let results  = [];
+
+      /* ═══════════════════════════════════════════
+         HELPERS
+      ═══════════════════════════════════════════ */
+      const $ = id => document.getElementById(id);
+      const isP2 = () => QUESTIONS[current].part === 2;
+
+      /* ═══════════════════════════════════════════
+         RENDER QUIZ QUESTION
+      ═══════════════════════════════════════════ */
+      function renderQuiz() {
+        const q     = QUESTIONS[current];
+        const isTF  = q.opts.length === 2;
+        const p2    = isP2();
+        const pLabel = p2 ? 'Part 2 · True or False?' : 'Part 1 · Choose the Correct Answer';
+        const pct    = (current / TOTAL) * 100;
+
+        /* Part-transition notice */
+        let noticeHTML = '';
+        if (current > 0 && q.part !== QUESTIONS[current - 1].part) {
+          const icon = p2 ? '✅' : '❓';
+          const sub  = p2 ? 'Decide if each statement is True or False.'
+                           : 'Choose the best answer from the options.';
+          noticeHTML = `
+            <div class="part-notice ${p2 ? 'p2' : 'p1'}">
+              <span class="part-notice-icon">${icon}</span>
+              <div>
+                <p class="part-notice-title">${pLabel}</p>
+                <p class="part-notice-sub">${sub}</p>
+              </div>
+            </div>`;
         }
-      });
 
-      if (selectedIdx === correctIdx) {
-        coins += 10;
-        coinsEl.textContent = coins;
+        /* Answer buttons */
+        let answersHTML;
+        if (isTF) {
+          answersHTML = `
+            <div class="answers-tf">
+              <button class="tf-btn tf-true"  id="opt0" onclick="choose(0)">${q.opts[0]}</button>
+              <button class="tf-btn tf-false" id="opt1" onclick="choose(1)">${q.opts[1]}</button>
+            </div>`;
+        } else {
+          answersHTML = `<div class="answers-mcq">` +
+            q.opts.map((opt, i) => `
+              <button class="mcq-btn" id="opt${i}" onclick="choose(${i})">
+                <span class="mcq-badge" id="badge${i}">${LABELS[i]}</span>
+                <span class="mcq-label" id="lbl${i}">${opt}</span>
+              </button>`).join('') +
+            `</div>`;
+        }
+
+        /* Dots */
+        const dotsHTML = QUESTIONS.map((_, i) => {
+          const cls = i < current ? 'done' : i === current ? 'active' : 'future';
+          return `<div class="dot ${cls}"></div>`;
+        }).join('');
+
+        $('app').innerHTML = `
+          ${noticeHTML}
+          <div class="card">
+            <div class="card-header ${p2 ? 'p2' : ''}" id="hdr">
+              <div class="header-left">
+                <span class="header-icon">🔍</span>
+                <div>
+                  <p class="header-eyebrow">ICT · Primary 6 · Lesson 4</p>
+                  <p class="header-name">Digital Search Tools</p>
+                </div>
+              </div>
+              <div class="header-right">
+                <p class="header-counter">${current + 1} <span>/ ${TOTAL}</span></p>
+                <p class="header-part">${pLabel}</p>
+              </div>
+            </div>
+            <div class="progress-track ${p2 ? 'p2' : ''}">
+              <div class="progress-fill ${p2 ? 'p2' : ''}" style="width:${pct}%"></div>
+            </div>
+            <div class="card-body">
+              <span class="part-badge ${p2 ? 'p2' : ''}">${pLabel}</span>
+              <h2 class="question-text">${q.q}</h2>
+              ${answersHTML}
+              <div id="feedback" style="display:none"></div>
+              <button class="next-btn ${p2 ? 'p2' : ''}" id="next-btn" style="display:none" onclick="next()">
+                ${current === TOTAL - 1 ? 'See My Results →' : 'Next Question →'}
+              </button>
+            </div>
+          </div>
+          <div class="dots">${dotsHTML}</div>`;
+
+        answered = false;
+        selected = null;
       }
 
-      nextBtn.style.display = "block";
-    }
+      /* ═══════════════════════════════════════════
+         CHOOSE ANSWER
+      ═══════════════════════════════════════════ */
+      function choose(idx) {
+        if (answered) return;
+        answered = true;
+        selected = idx;
 
-    function nextQuestion() {
-      currentQuestionIndex++;
-      if (currentQuestionIndex < questions.length) {
-        loadQuestion();
-      } else {
-        showWinScreen();
+        const q      = QUESTIONS[current];
+        const isTF   = q.opts.length === 2;
+        const ok     = idx === q.ans;
+        results.push(ok);
+
+        /* Style buttons */
+        if (isTF) {
+          for (let i = 0; i < 2; i++) {
+            const btn = $(`opt${i}`);
+            btn.disabled = true;
+            if (i === q.ans)       btn.className = 'tf-btn tf-correct';
+            else if (i === idx)    btn.className = 'tf-btn tf-wrong';
+            else                   btn.className = 'tf-btn tf-dimmed';
+          }
+        } else {
+          for (let i = 0; i < q.opts.length; i++) {
+            $(`opt${i}`).disabled = true;
+            if (i === q.ans) {
+              $(`opt${i}`).className = 'mcq-btn state-correct';
+              $(`badge${i}`).className = 'mcq-badge bc';
+              $(`badge${i}`).textContent = '✓';
+              $(`lbl${i}`).className = 'mcq-label lc';
+            } else if (i === idx) {
+              $(`opt${i}`).className = 'mcq-btn state-wrong';
+              $(`badge${i}`).className = 'mcq-badge bw';
+              $(`badge${i}`).textContent = '✗';
+              $(`lbl${i}`).className = 'mcq-label lw';
+            } else {
+              $(`opt${i}`).className = 'mcq-btn state-dimmed';
+              $(`badge${i}`).className = 'mcq-badge bd';
+              $(`lbl${i}`).className = 'mcq-label ld';
+            }
+          }
+        }
+
+        /* Feedback */
+        const fb = $('feedback');
+        fb.className = `feedback ${ok ? 'fb-correct' : 'fb-wrong'}`;
+        fb.innerHTML = `
+          <p class="fb-title">${ok ? '✓ Correct!' : '✗ Not quite!'}</p>
+          <p class="fb-text">${q.exp}</p>`;
+        fb.style.display = 'block';
+
+        /* Next button */
+        $('next-btn').style.display = 'block';
       }
-    }
 
-    function showWinScreen() {
-      quizScreen.style.display = "none";
-      winScreen.style.display = "block";
-      finalScoreEl.textContent = `You total score: ${coins} Tech Coins out of 100!`;
-    }
+      /* ═══════════════════════════════════════════
+         NEXT QUESTION
+      ═══════════════════════════════════════════ */
+      function next() {
+        if (current === TOTAL - 1) {
+          renderResults();
+        } else {
+          current++;
+          renderQuiz();
+        }
+      }
 
-    function restartGame() {
-      currentQuestionIndex = 0;
-      coins = 0;
-      coinsEl.textContent = coins;
-      winScreen.style.display = "none";
-      quizScreen.style.display = "block";
-      loadQuestion();
-    }
+      /* ═══════════════════════════════════════════
+         RESULTS SCREEN
+      ═══════════════════════════════════════════ */
+      function renderResults() {
+        const score = results.filter(Boolean).length;
+        const pct   = score / TOTAL;
 
-    // Initialize game
-    loadQuestion();
-  </script>
-</body>
+        let emoji, title, msg;
+        if      (pct === 1)   { emoji = '🏆'; title = 'Perfect Score!';   msg = 'Outstanding! You mastered every question in Lesson 4.'; }
+        else if (pct >= 0.75) { emoji = '⭐'; title = 'Excellent Work!';   msg = 'Great job! You have a strong understanding of digital search tools.'; }
+        else if (pct >= 0.5)  { emoji = '👍'; title = 'Good Effort!';      msg = 'You know the basics! Review the questions you missed to improve.'; }
+        else                  { emoji = '📚'; title = 'Keep Practicing!';  msg = 'Review Lesson 4 in your textbook and practise the exercises with your teacher.'; }
+
+        const p1r    = results.slice(0, PART1_COUNT);
+        const p2r    = results.slice(PART1_COUNT);
+        const p1s    = p1r.filter(Boolean).length;
+        const p2s    = p2r.filter(Boolean).length;
+
+        const bubblesHTML = results.map((ok, i) =>
+          `<div class="bubble ${ok ? 'ok' : 'bad'}" title="Q${i + 1}">${ok ? '✓' : '✗'}</div>`
+        ).join('');
+
+        $('app').innerHTML = `
+          <div class="results-card">
+            <div class="results-header">
+              <span class="rh-icon">🔍</span>
+              <div>
+                <p class="rh-eyebrow">ICT · Primary 6</p>
+                <p class="rh-title">Lesson 4: Digital Search Tools</p>
+              </div>
+            </div>
+            <div class="results-body">
+              <div class="result-emoji">${emoji}</div>
+              <h2 class="result-title">${title}</h2>
+              <p class="result-msg">${msg}</p>
+
+              <div class="score-box">
+                <p class="score-num">${score}<span class="score-denom">/${TOTAL}</span></p>
+                <p class="score-lbl">Questions Answered Correctly</p>
+              </div>
+
+              <div class="part-breakdown">
+                <div class="pb-box pb1">
+                  <p class="pb-lbl">Part 1 · MCQ</p>
+                  <p class="pb-score">${p1s}<span class="pb-den">/${PART1_COUNT}</span></p>
+                </div>
+                <div class="pb-box pb2">
+                  <p class="pb-lbl">Part 2 · True / False</p>
+                  <p class="pb-score">${p2s}<span class="pb-den">/${p2r.length}</span></p>
+                </div>
+              </div>
+
+              <p class="bubbles-lbl">Question Results</p>
+              <div class="bubbles">${bubblesHTML}</div>
+
+              <p class="results-footer">
+                Quiz complete — ask your teacher to review any questions you found tricky!
+              </p>
+            </div>
+          </div>`;
+      }
+
+      /* ── Start ── */
+      renderQuiz();
+    </script>
+  </body>
 </html>
